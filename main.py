@@ -12,6 +12,9 @@ battery = 0
 # setup usable battery, ie, battery failure means usable is false
 usableBattery = False
 
+# battery charge that cannot be used right now but can be used next
+buffer = 0
+
 
 # Testing connections - not expected anything crazy just make a baseline and hopefully it works
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
