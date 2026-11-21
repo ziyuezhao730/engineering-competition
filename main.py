@@ -1,6 +1,7 @@
 import socket
 import json
 import optimization
+import solarfailure
 
 HOST = "127.0.0.1"
 PORT = 8800
@@ -62,18 +63,48 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
         message["buildings"] = optimization.plan(response["loads"], response["random_event"], forecast, response["grid_cost"])
         
         for j, i in enumerate(response["loads"]):
+            building = i["type"]
+
             # Use available resources to allocate to each building
 
             # No Failure
 
             # Solar Failure
+            if response["random_event"] == "cloudy_weather":
+                # solar_failure()
+                pass
+            
+            elif response["random_event"] == "grid_failure":
+                # grid_failure()
+                pass
 
+            elif response["random_event"] == "battery_failure":
+                # battery_failure()
+                pass
             # Generator Failure
 
             # Battery Failure
 
             # Grid Failure
         
+            else:
+                # regular
+                pass        
+            
+            message["buildings"].append({"solar": 0, "battery": 0, "grid": i["load"]})
+
+            if response["random_event"] == "cloudy_weather":
+                    message["buildings"], battery = solarfailure.check_solar(
+                battery, response["loads"]
+            )
+            else:
+                for building in response["loads"]:
+                    message["buildings"].append({
+                        "solar": 0,
+                        "battery": 0,
+                        "grid": building["load"]
+                    })
+
         message["generator"] = 100 - battery if (not response["random_event"] == "generator_failure") else 0
         
         data = json.dumps(message).encode('utf-8')
