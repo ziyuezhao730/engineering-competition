@@ -18,6 +18,7 @@ buffer = 0
 
 # function that manages battery. Keep battery charged at all times
 def set_up_battery(event, next_event, cost):
+    global battery, usableBattery, buffer
     # charges the battery even if battery fails right now
     if (buffer != 0 and event != "generator_failure"):
         battery = (battery + buffer) % 101
@@ -95,7 +96,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
         # create dictionary for the output message
         message = {"buildings": [], "generator": 0}
 
-        optimization.set_up_battery(response["random_event"], forecast, cost)
+        set_up_battery(response["random_event"], forecast, cost)
         message["buildings"] = optimization.plan(response["loads"], response["random_event"], forecast, cost)
         
         # for j, i in enumerate(response["loads"]):
