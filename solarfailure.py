@@ -5,4 +5,6 @@ def check_solar(battery, loads):
         demand = building["load"]
         battery_used = min(battery, demand)
         grid = demand - battery_used
-    return battery_used, grid
+    
+    return {"solar": 0, "battery": battery_used, "grid": grid}
+    
