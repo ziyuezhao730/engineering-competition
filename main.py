@@ -1,5 +1,6 @@
 import socket
 import json
+import solarfailure
 
 HOST = "127.0.0.1"
 PORT = 8800
@@ -82,6 +83,18 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
             # Grid Failure
 
             message["buildings"].append({"solar": 0, "battery": 0, "grid": i["load"]})
+
+            if response["random_event"] == "cloudy_weather":
+                    message["buildings"], battery = solarfailure.check_solar(
+                battery, response["loads"]
+            )
+            else:
+                for building in response["loads"]:
+                    message["buildings"].append({
+                        "solar": 0,
+                        "battery": 0,
+                        "grid": building["load"]
+                    })
 
         message["generator"] = 100 - battery if (not response["random_event"] == "generator_failure") else 0
         
