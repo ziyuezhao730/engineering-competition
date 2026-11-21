@@ -20,6 +20,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
         rawResponse = client.recv(4096)
         response = json.loads(rawResponse.decode('utf-8'))
 
+        # charged battery @ first hour, emergency use
+        if i > 0: 
+            battery = 100
+            usableBattery = True
+
         # the answer for each input
         electricityPlan = []
 
