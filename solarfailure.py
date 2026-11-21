@@ -12,4 +12,4 @@ def check_solar(battery, loads):
             "grid": demand - battery_used
         })
 
-    return buildings, battery
+    return battery, buildings

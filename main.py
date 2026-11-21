@@ -70,27 +70,27 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
                 non_lecture += i["load"]
         
         for j, i in enumerate(response["load"]):
+            building = i["type"]
             # Use available resources to allocate to each building
 
             # No Failure
 
             # Solar Failure
+            if response["random_event"] == "cloudy_weather":
+                # solar_failure()
+                pass
+            
+            elif response["random_event"] == "grid_failure":
+                # grid_failure()
+                pass
 
-            # Generator Failure
+            elif response["random_event"] == "battery_failure":
+                # battery_failure()
+                pass
 
-            # Battery Failure
-
-            # Grid Failure
-
-            
-            
-            
-            
-            
-            
-            
-            
-            
+            else:
+                # regular
+                pass        
             
             message["buildings"].append({"solar": 0, "battery": 0, "grid": i["load"]})
 
