@@ -17,7 +17,7 @@ def check_grid(battery, solar, load):
     battery_used = 0
     if type == "lecture_hall":
         battery_used = demand
-    elif solar >= load:
+    elif solar >= load["load"]:
         solar_used = demand
     else:
         solar_used = solar
