@@ -10,12 +10,16 @@ PORT = 8800
 # setup battery charge
 battery = 0
 
+# setup usable battery, ie, battery failure means usable is false
+usableBattery = False
+
+# battery charge that cannot be used right now but can be used next
+buffer = 0
+
+
 # Testing connections - not expected anything crazy just make a baseline and hopefully it works
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
     client.connect((HOST, PORT))
-
-    # setup usable battery, ie, battery failure means usable is false
-    usableBattery = False
 
     # runs for 24 hours
     for i in range(24):
@@ -59,9 +63,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
         if (response["random_event"] == "grid_failure"):
             gridFailure = True
 
+        cost = response["grid_cost"]
         message = {"buildings": [], "generator": 0}
-
-        message["buildings"] = optimization.plan(response["loads"], response["random_event"], forecast, response["grid_cost"])
+        optimization.set_up_battery(response["random_event"], forecast, cost)
+        message["buildings"] = optimization.plan(response["loads"], response["random_event"], forecast, cost)
         
         for j, i in enumerate(response["loads"]):
             building = i["type"]
