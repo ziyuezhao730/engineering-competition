@@ -1,5 +1,31 @@
 from failure_handling import check_solar, check_grid, check_battery
-from main import usableBattery, battery, buffer
+
+# in case of no event happening
+def no_event(battery, next_event, solar, cost, load):
+    demand = load["load"]
+    type = load["type"]
+    bt_used = 0
+    grid_used = 0
+    solar_used = 0
+    # use battery if only generator can be charged next and grid is more expensive
+    if (next_event != "grid_failure" and next_event != "generator_failure" and cost > 1):
+        if load["type"] == "lecture_hall":
+            bt_used = min(demand, battery)
+            demand -= bt_used
+            grid_used = demand
+        else:
+            solar_used = min(demand, solar)
+            demand -= solar_used
+            bt_used = min(demand, battery)
+            demand -= bt_used
+            grid_used = demand
+    else:
+        solar_used = min(demand, solar)
+        demand -= solar_used
+        grid_used = demand
+        
+    return {"solar": solar_used, "battery": bt_used, "grid": grid_used}
+
 
 # assigns power
 def plan(demands, event, next_event, cost):
@@ -8,6 +34,8 @@ def plan(demands, event, next_event, cost):
     non_lecture = 0 
     cost = 0
     power = {}
+    solar = 200
+    battery = 100
     # calls other functions in case of failures
     for idx, demand in enumerate(demands):
         if (demand["type"] == "lecture_hall"):
@@ -16,37 +44,19 @@ def plan(demands, event, next_event, cost):
             non_lecture += demand["load"]
         if (event == "cloudy_weather"):
             power = check_solar(battery, demand)
+            battery -= power["battery"]
         elif (event == "gridfailure"):
-            power = check_grid(battery, demand)
+            power = check_grid(battery, solar, demand)
+            battery -= power["battery"]
+            solar -= power["solar"]
         elif (event == "batteryfailure"):
+            power = checkBattery(solar, demand)
+            solar -= power["solar"]
         else: 
+            power = no_event(battery, next_event, solar, cost, demand)
+            battery -= power["battery"]
+            solar -= power["solar"]
+
         power_usage.append(power)
         
     return power_usage
-
-# function that manages battery. Keep battery charged at all times
-def set_up_battery(event, next_event, cost):
-    # charges the battery even if battery fails right now
-    if (buffer != 0 and event != "generator_failure"):
-        battery = (battery + buffer) % 101
-        buffer = 0
-    if (battery == 0):
-        if (event != "generator_failure"):
-            buffer = 100
-        usableBattery = False 
-    elif (battery < 100):
-        if (event != "generator_failure"):
-            buffer = 100 - battery
-        # usableBattery = True, for safety reasons, we will never use our battery
-        usableBattery = False # comment out this line if we want to prioritize lowering cost more
-    elif (battery == 100):
-        # usableBattery = True, for safety reasons, we will never use our battery
-        usableBattery = False # comment out this line if we want to prioritize lowering cost more
-    if (event == "battery_failure"):
-        usableBattery = False
-        return
-    if (next_event == "grid_failure"):
-        usableBattery = False
-    if (event != "grid_faliure" and cost <= 1):
-        usableBattery = False
-
