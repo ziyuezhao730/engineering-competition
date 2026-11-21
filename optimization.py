@@ -20,7 +20,7 @@ def plan(demands, event, next_event, grid_price):
             else:
                 power = check_solar(battery)
         
-        power_usage.append({"solar": 0, "battery": 0, "grid": demand["load"]})
+        power_usage.append(power)
 
 # function that manages battery. Keep battery charged at all times
 def set_up_battery(event, next_event):
@@ -37,3 +37,4 @@ def set_up_battery(event, next_event):
         usableBattery = True
     if (next_event == "grid_failure"):
         usableBattery = False
+
