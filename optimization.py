@@ -1,5 +1,5 @@
 from solarfailure import check_solar
-from main import usableBattery
+from main import usableBattery, battery, buffer
 
 # assigns power
 def plan(demands, event, next_event, cost):
@@ -7,6 +7,7 @@ def plan(demands, event, next_event, cost):
     lecture = 0
     non_lecture = 0 
     cost = 0
+    power = {}
     # calls other functions in case of failures
     for idx, demand in enumerate(demands):
         if (demand["type"] == "lecture_hall"):
@@ -17,6 +18,8 @@ def plan(demands, event, next_event, cost):
             power = check_solar(battery, demand)
         
         power_usage.append(power)
+        
+    return power_usage
 
 # function that manages battery. Keep battery charged at all times
 def set_up_battery(event, next_event, cost):
@@ -27,11 +30,11 @@ def set_up_battery(event, next_event, cost):
         if (event != "generator_failure"):
             buffer = 100
         usableBattery = False 
-    else if (battery < 100):
+    elif (battery < 100):
         if (event != "generator_failure"):
             buffer = 100 - battery
         usabeBattery = True
-    else if (battery == 100):
+    elif (battery == 100):
         usableBattery = True
         
     if (next_event == "grid_failure"):
