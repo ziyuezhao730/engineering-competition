@@ -9,12 +9,13 @@ PORT = 8800
 # setup battery charge
 battery = 0
 
+# setup usable battery, ie, battery failure means usable is false
+usableBattery = False
+
+
 # Testing connections - not expected anything crazy just make a baseline and hopefully it works
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
     client.connect((HOST, PORT))
-
-    # setup usable battery, ie, battery failure means usable is false
-    usableBattery = False
 
     # runs for 24 hours
     for i in range(24):
