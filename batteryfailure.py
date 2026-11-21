@@ -1,13 +1,11 @@
-def checkBattery(loads, grid, solar):
-    for building in loads:
-        demand = building["load"]
-        if building["type"] == "lecture_hall":
-            grid += demand
+def checkBattery(demand, grid, solar):
+    if building["type"] == "lecture_hall":
+        grid += demand
+    else:
+        if solar < demand:
+            solar = 0
+            grid += demand - solar
         else:
-            if solar < demand:
-                solar = 0
-                grid += demand - solar
-            else:
-                solar -= demand
+            solar -= demand
 
-    return [grid, solar]
+    return {"solar": solar_used, "battery": battery_used, "grid": 0}
