@@ -1,15 +1,16 @@
 import socket
 import json
+import optimization
 
 HOST = "127.0.0.1"
 PORT = 8800
 
+# setup battery charge
+battery = 0
+
 # Testing connections - not expected anything crazy just make a baseline and hopefully it works
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
     client.connect((HOST, PORT))
-
-    # setup battery charge right now
-    battery = 0
 
     # setup usable battery, ie, battery failure means usable is false
     usableBattery = False
@@ -31,7 +32,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
         # assign total charge for solar to be split between buildings
         solar = 200
 
-        # ignore forecast for this sample - this is for future
+        # ignore forecast for this sample - this is for future    
         forecast = response["forecast"]
 
         # track how much grid is used
@@ -58,17 +59,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
 
         message = {"buildings": [], "generator": 0}
 
-        lecture = 0
-        non_lecture = 0 
-
-        # NOT optimized AT ALL - use all grid
-        for j, i in enumerate(response["load"]):
-            if (i["type"] == "lecture_hall"):
-                lecture += i["load"]
-            else:
-                non_lecture += i["load"]
+        message["buildings"] = optimization.plan(response["loads"], response["random_event"], forecast, response["grid_cost"])
         
-        for j, i in enumerate(response["load"]):
+        for j, i in enumerate(response["loads"]):
             # Use available resources to allocate to each building
 
             # No Failure
@@ -80,9 +73,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
             # Battery Failure
 
             # Grid Failure
-
-            message["buildings"].append({"solar": 0, "battery": 0, "grid": i["load"]})
-
+        
         message["generator"] = 100 - battery if (not response["random_event"] == "generator_failure") else 0
         
         data = json.dumps(message).encode('utf-8')
