@@ -1,4 +1,4 @@
-from failure_handling import check_solar, check_grid, check_battery
+from failure_handling import check_solar, check_grid, checkBattery
 
 # in case of no event happening
 def no_event(battery, next_event, solar, cost, load):
