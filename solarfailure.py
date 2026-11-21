@@ -1,5 +1,7 @@
+from main import usableBattery
+
 def check_solar(battery, load, cost):
-    if (cost <= 1):
+    if (cost <= 1 or !usableBattery):
         return {"solar": 0, "battery": 0, "grid": grid}
 
     demand = building["load"]
