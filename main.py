@@ -89,8 +89,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
         if (response["random_event"] == "grid_failure"):
             gridFailure = True
 
+        # set cost to the grid price for the current hour
         cost = response["grid_cost"]
+
+        # create dictionary for the output message
         message = {"buildings": [], "generator": 0}
+
         optimization.set_up_battery(response["random_event"], forecast, cost)
         message["buildings"] = optimization.plan(response["loads"], response["random_event"], forecast, cost)
         
@@ -123,7 +127,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
         #     message["buildings"].append({"solar": solar_usage, "battery": battery_usage, "grid": grid_usage})
 
         message["generator"] = 100 - battery if (not response["random_event"] == "generator_failure") else 0
-        
+
+        # jsonify the message dictionary and encode it to be sent as output
         data = json.dumps(message).encode('utf-8')
         client.sendall(data)
     
