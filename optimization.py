@@ -1,4 +1,4 @@
-from solarfailure import
+from solarfailure import check_solar
 
 # assigns power
 def plan(demands, event, next_event, grid_price):
