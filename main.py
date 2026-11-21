@@ -2,6 +2,7 @@ import socket
 import json
 import optimization
 import solarfailure
+import gridfailure
 
 HOST = "127.0.0.1"
 PORT = 8800
@@ -72,11 +73,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
             # Solar Failure
             if response["random_event"] == "cloudy_weather":
                 solar_usage = 0
-                battery_usage, grid_usage = solarfailure(battery, i)
+                battery_usage, grid_usage = solarfailure.check_solar(battery, i)
             
             elif response["random_event"] == "grid_failure":
-                # grid_failure()
-                pass
+                grid_usage = 0
+                solar_usage, battery_usage = gridfailure.check_grid(battery, i)
 
             elif response["random_event"] == "battery_failure":
                 # battery_failure()
