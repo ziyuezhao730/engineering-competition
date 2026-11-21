@@ -1,4 +1,5 @@
 from solarfailure import check_solar
+from main import usableBattery
 
 # assigns power
 def plan(demands, event, next_event, cost):
