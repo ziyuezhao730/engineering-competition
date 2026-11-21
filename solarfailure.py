@@ -1,10 +1,9 @@
-def check_solar(battery, loads):
-    buildings = []
+def check_solar(battery, load, cost):
+    if (cost <= 1):
+        return {"solar": 0, "battery": 0, "grid": grid}
 
-    for building in loads:
-        demand = building["load"]
-        battery_used = min(battery, demand)
-        grid = demand - battery_used
-    
+    demand = building["load"]
+    battery_used = min(battery, demand)
+    grid = demand - battery_used
     return {"solar": 0, "battery": battery_used, "grid": grid}
     
