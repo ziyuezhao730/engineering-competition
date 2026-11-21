@@ -14,10 +14,7 @@ def plan(demands, event, next_event, cost):
         else:
             non_lecture += demand["load"]
         if (event == "cloudy_weather"):
-            if not usableBattery:
-                power = check_solar(0, demand, cost)
-            else:
-                power = check_solar(battery, demand, cost)
+            power = check_solar(battery, demand)
         
         power_usage.append(power)
 
