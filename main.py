@@ -63,8 +63,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
 
         # NOT optimized AT ALL - use all grid
         for j, i in enumerate(response["load"]):
-            if (i["type"] == "Lecture Hall"):
-              lecture += i["load"]
+            if (i["type"] == "lecture_hall"):
+                lecture += i["load"]
             else:
                 non_lecture += i["load"]
         
@@ -82,6 +82,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
             # Grid Failure
 
             message["buildings"].append({"solar": 0, "battery": 0, "grid": i["load"]})
+
+        message["generator"] = 100 - battery if (not response["random_event"] == "generator_failure") else 0
         
         data = json.dumps(message).encode('utf-8')
         client.sendall(data)
