@@ -32,7 +32,6 @@ def plan(demands, event, next_event, cost):
     power_usage = []
     lecture = 0
     non_lecture = 0 
-    cost = 0
     power = {}
     solar = 200
     battery = 100
@@ -45,11 +44,11 @@ def plan(demands, event, next_event, cost):
         if (event == "cloudy_weather"):
             power = check_solar(battery, demand)
             battery -= power["battery"]
-        elif (event == "gridfailure"):
+        elif (event == "grid_failure"):
             power = check_grid(battery, solar, demand)
             battery -= power["battery"]
             solar -= power["solar"]
-        elif (event == "batteryfailure"):
+        elif (event == "battery_failure"):
             power = checkBattery(solar, demand)
             solar -= power["solar"]
         else: 
