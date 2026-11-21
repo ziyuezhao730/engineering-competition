@@ -52,11 +52,31 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
             gridFailure = True
 
         message = {"buildings": [], "generator": 0}
+
+        lecture = 0
+        non_lecture = 0 
+
         # NOT optimized AT ALL - use all grid
         for j, i in enumerate(response["load"]):
-            gridUsage += i["load"]
-            message["buildings"].append({"solar": 0, "battery": 0, "grid": i["load"]})
+            if (i["type"] == "library"):
+              lecture += i["load"]
+            else:
+                non_lecture += i["load"]
+        
+        for j, i in enumerate(response["load"]):
+            # Use available resources to allocate to each building
 
+            # No Failure
+            
+            # Solar Failure
+
+            # Generator Failure
+
+            # Battery Failure
+
+            # Grid Failure
+
+            message["buildings"].append({"solar": 0, "battery": 0, "grid": i["load"]})
         
         data = json.dumps(message).encode('utf-8')
         client.sendall(data)
