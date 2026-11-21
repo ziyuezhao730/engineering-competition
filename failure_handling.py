@@ -10,9 +10,8 @@ def check_solar(battery, load):
     return {"solar": 0, "battery": battery_used, "grid": grid}
 
 
-def check_grid(battery, solar, building):
-    load = building["load"]
-    type = building["type"]
+def check_grid(battery, solar, load):
+    demand = load["load"]
     solar_used = 0
     battery_used = 0
     if type == "lecture_hall":
