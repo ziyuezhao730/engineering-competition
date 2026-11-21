@@ -22,7 +22,7 @@ def plan(demands, event, next_event, cost):
         power_usage.append(power)
 
 # function that manages battery. Keep battery charged at all times
-def set_up_battery(event, next_event):
+def set_up_battery(event, next_event, cost):
     if (buffer != 0 and event != "generator_failure"):
         battery = (battery + buffer) % 101
         buffer = 0
@@ -36,6 +36,9 @@ def set_up_battery(event, next_event):
         usabeBattery = True
     else if (battery == 100):
         usableBattery = True
+        
     if (next_event == "grid_failure"):
+        usableBattery = False
+    if (event != "grid_faliure" and cost <= 1):
         usableBattery = False
 
