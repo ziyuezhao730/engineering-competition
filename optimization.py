@@ -6,7 +6,7 @@ def plan(demands, event, next_event, grid_price):
     lecture = 0
     non_lecture = 0 
     cost = 0
-    # NOT optimized AT ALL - use all grid
+    # calls other functions in case of failures
     for idx, demand in enumerate(demands):
         if (demand["type"] == "lecture_hall"):
             lecture += demand["load"]
