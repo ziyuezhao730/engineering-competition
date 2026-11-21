@@ -16,6 +16,32 @@ usableBattery = False
 # battery charge that cannot be used right now but can be used next
 buffer = 0
 
+# function that manages battery. Keep battery charged at all times
+def set_up_battery(event, next_event, cost):
+    # charges the battery even if battery fails right now
+    if (buffer != 0 and event != "generator_failure"):
+        battery = (battery + buffer) % 101
+        buffer = 0
+    if (battery == 0):
+        if (event != "generator_failure"):
+            buffer = 100
+        usableBattery = False 
+    elif (battery < 100):
+        if (event != "generator_failure"):
+            buffer = 100 - battery
+        # usableBattery = True, for safety reasons, we will never use our battery
+        usableBattery = False # comment out this line if we want to prioritize lowering cost more
+    elif (battery == 100):
+        # usableBattery = True, for safety reasons, we will never use our battery
+        usableBattery = False # comment out this line if we want to prioritize lowering cost more
+    if (event == "battery_failure"):
+        usableBattery = False
+        return
+    if (next_event == "grid_failure"):
+        usableBattery = False
+    if (event != "grid_faliure" and cost <= 1):
+        usableBattery = False
+
 
 # Testing connections - not expected anything crazy just make a baseline and hopefully it works
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
