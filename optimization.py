@@ -1,4 +1,4 @@
-from solarfailure import check_solar
+from failure_handling import check_solar, check_grid, check_battery
 from main import usableBattery, battery, buffer
 
 # assigns power
@@ -17,6 +17,7 @@ def plan(demands, event, next_event, cost):
         if (event == "cloudy_weather"):
             power = check_solar(battery, demand)
         elif (event == "gridfailure"):
+            power = check_grid(battery, demand)
         elif (event == "batteryfailure"):
         else: 
         power_usage.append(power)
@@ -36,9 +37,11 @@ def set_up_battery(event, next_event, cost):
     elif (battery < 100):
         if (event != "generator_failure"):
             buffer = 100 - battery
-        usabeBattery = True
+        # usableBattery = True, for safety reasons, we will never use our battery
+        usableBattery = False # comment out this line if we want to prioritize lowering cost more
     elif (battery == 100):
-        usableBattery = True
+        # usableBattery = True, for safety reasons, we will never use our battery
+        usableBattery = False # comment out this line if we want to prioritize lowering cost more
     if (event == "battery_failure"):
         usableBattery = False
         return
