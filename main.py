@@ -62,9 +62,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
         if (response["random_event"] == "grid_failure"):
             gridFailure = True
 
+        cost = response["grid_cost"]
         message = {"buildings": [], "generator": 0}
-        optimization.set_up_battery(response["random_event"], forecast)
-        message["buildings"] = optimization.plan(response["loads"], response["random_event"], forecast, response["grid_cost"])
+        optimization.set_up_battery(response["random_event"], forecast, cost)
+        message["buildings"] = optimization.plan(response["loads"], response["random_event"], forecast, cost)
         
         for j, i in enumerate(response["loads"]):
             building = i["type"]
@@ -94,6 +95,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
             else:
                 # regular
                 pass        
+
             
             message["buildings"].append({"solar": 0, "battery": 0, "grid": i["load"]})
 
