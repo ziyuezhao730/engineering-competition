@@ -60,7 +60,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
             gridFailure = True
 
         message = {"buildings": [], "generator": 0}
-
+        optimization.set_up_battery(response["random_event"], forecast)
         message["buildings"] = optimization.plan(response["loads"], response["random_event"], forecast, response["grid_cost"])
         
         for j, i in enumerate(response["loads"]):
