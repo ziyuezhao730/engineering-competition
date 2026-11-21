@@ -16,13 +16,16 @@ def plan(demands, event, next_event, cost):
             non_lecture += demand["load"]
         if (event == "cloudy_weather"):
             power = check_solar(battery, demand)
-        
+        elif (event == "gridfailure"):
+        elif (event == "batteryfailure"):
+        else: 
         power_usage.append(power)
         
     return power_usage
 
 # function that manages battery. Keep battery charged at all times
 def set_up_battery(event, next_event, cost):
+    # charges the battery even if battery fails right now
     if (buffer != 0 and event != "generator_failure"):
         battery = (battery + buffer) % 101
         buffer = 0
@@ -36,7 +39,9 @@ def set_up_battery(event, next_event, cost):
         usabeBattery = True
     elif (battery == 100):
         usableBattery = True
-        
+    if (event == "battery_failure"):
+        usableBattery = False
+        return
     if (next_event == "grid_failure"):
         usableBattery = False
     if (event != "grid_faliure" and cost <= 1):
