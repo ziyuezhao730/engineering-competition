@@ -19,8 +19,10 @@ def no_event(battery, solar, cost, load):
             demand -= bt_used
             grid_used = demand
     else:
-        solar_used = min(demand, solar)
-        demand -= solar_used
+        # lecture halls have no solar panels
+        if load["type"] != "lecture_hall":
+            solar_used = min(demand, solar)
+            demand -= solar_used
         grid_used = demand
         
     return {"solar": solar_used, "battery": bt_used, "grid": grid_used}

@@ -14,8 +14,9 @@ def check_grid(battery, solar, load):
     demand = load["load"]
     type = load["type"]
     if type == "lecture_hall":
+        # lecture halls have no solar panels, so the battery is their only source here
         battery_used = min(battery, demand)
-        solar_used = min(solar, demand - battery_used)
+        solar_used = 0
     else:
         solar_used = min(solar, demand)
         battery_used = min(battery, demand - solar_used)
