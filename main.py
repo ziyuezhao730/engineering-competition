@@ -58,7 +58,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
 
         # NOT optimized AT ALL - use all grid
         for j, i in enumerate(response["load"]):
-            if (i["type"] == "library"):
+            if (i["type"] == "Lecture Hall"):
               lecture += i["load"]
             else:
                 non_lecture += i["load"]
@@ -67,7 +67,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
             # Use available resources to allocate to each building
 
             # No Failure
-            
+
             # Solar Failure
 
             # Generator Failure
