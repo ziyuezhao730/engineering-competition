@@ -82,6 +82,16 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
 
             # Grid Failure
 
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             message["buildings"].append({"solar": 0, "battery": 0, "grid": i["load"]})
 
             if response["random_event"] == "cloudy_weather":
