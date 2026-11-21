@@ -25,15 +25,15 @@ def plan(demands, event, next_event, grid_price):
 # function that manages battery. Keep battery charged at all times
 def set_up_battery(event, next_event):
     if (buffer != 0):
-        battery += buffer
+        battery = (battery + buffer) % 101
         buffer = 0
     if (battery == 0):
         buffer = 100
-        usableBattery = False
-        return 
-    if (battery < 100):
+        usableBattery = False 
+    else if (battery < 100):
         buffer = 100 - battery
         usabeBattery = True
-        return
-    if (battery == 100):
+    else if (battery == 100):
         usableBattery = True
+    if (next_event == "grid_failure"):
+        usableBattery = False
