@@ -1,8 +1,6 @@
 import socket
 import json
 import optimization
-import solarfailure
-import gridfailure
 
 HOST = "127.0.0.1"
 PORT = 8800
@@ -17,19 +15,15 @@ usableBattery = False
 buffer = 0
 
 # function that manages battery. Keep battery charged at all times
-def set_up_battery(event, next_event, cost):
+def set_up_battery(event, cost):
     global battery, usableBattery, buffer
-    # charges the battery even if battery fails right now
-    if (buffer != 0 and event != "generator_failure"):
-        battery = (battery + buffer) % 101
+    # the charge the generator added last hour becomes usable now
+    if (buffer != 0):
+        battery = min(100, battery + buffer)
         buffer = 0
     if (battery == 0):
-        if (event != "generator_failure"):
-            buffer = 100
-        usableBattery = False 
+        usableBattery = False
     elif (battery < 100):
-        if (event != "generator_failure"):
-            buffer = 100 - battery
         # usableBattery = True, for safety reasons, we will never use our battery
         usableBattery = False # comment out this line if we want to prioritize lowering cost more
     elif (battery == 100):
@@ -38,9 +32,7 @@ def set_up_battery(event, next_event, cost):
     if (event == "battery_failure"):
         usableBattery = False
         return
-    if (next_event == "grid_failure"):
-        usableBattery = False
-    if (event != "grid_faliure" and cost <= 1):
+    if (event != "grid_failure" and cost <= 1):
         usableBattery = False
 
 
@@ -54,14 +46,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
         rawResponse = client.recv(4096)
         response = json.loads(rawResponse.decode('utf-8'))
 
+        # battery is allowed by default; the checks below and set_up_battery() can rule it out
+        usableBattery = True
+
         # the answer for each input
         electricityPlan = []
 
         # assign total charge for solar to be split between buildings
         solar = 200
-
-        # ignore forecast for this sample - this is for future    
-        forecast = response["forecast"]
 
         # track how much grid is used
         gridUsage = 0
@@ -91,38 +83,16 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
         # create dictionary for the output message
         message = {"buildings": [], "generator": 0}
 
-        set_up_battery(response["random_event"], forecast, cost)
-        message["buildings"] = optimization.plan(response["loads"], response["random_event"], forecast, cost)
+        set_up_battery(response["random_event"], cost)
+        message["buildings"] = optimization.plan(response["loads"], response["random_event"], cost, battery, usableBattery)
         
-        # for j, i in enumerate(response["loads"]):
-        #     building = i["type"]
 
-        #     # Use available resources to allocate to each building
+        # take out what the buildings drew from the battery this hour
+        battery -= sum(b["battery"] for b in message["buildings"])
 
-        #     # No Failure
-
-        #     # Solar Failure
-        #     if response["random_event"] == "cloudy_weather":
-        #         solar_usage = 0
-        #         battery_usage, grid_usage = solarfailure.check_solar(battery, i)
-            
-        #     elif response["random_event"] == "grid_failure":
-        #         grid_usage = 0
-        #         solar_usage, battery_usage = gridfailure.check_grid(battery, i)
-
-        #     elif response["random_event"] == "battery_failure":
-        #         # battery_failure()
-        #         pass
-        
-        #     else:
-        #         # regular
-        #         pass        
-
-        #     solar -= solar_usage
-        #     battery -= battery_usage
-        #     message["buildings"].append({"solar": solar_usage, "battery": battery_usage, "grid": grid_usage})
-
+        # generator tops the battery back up to 100; that charge is usable next hour
         message["generator"] = 100 - battery if (not response["random_event"] == "generator_failure") else 0
+        buffer = message["generator"]
 
         # jsonify the message dictionary and encode it to be sent as output
         data = json.dumps(message).encode('utf-8')

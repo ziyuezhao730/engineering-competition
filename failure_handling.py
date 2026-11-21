@@ -1,8 +1,7 @@
-from main import usableBattery
-
-def check_solar(battery, load):
+# cloudy day
+def check_solar(battery, load, usable_battery):
     demand = load["load"]
-    if not usableBattery:
+    if not usable_battery:
         return {"solar": 0, "battery": 0, "grid": demand}
 
     battery_used = min(battery, demand)
@@ -10,30 +9,23 @@ def check_solar(battery, load):
     return {"solar": 0, "battery": battery_used, "grid": grid}
 
 
+# grid is down: only battery and solar are left, and neither can supply more than it has
 def check_grid(battery, solar, load):
     demand = load["load"]
     type = load["type"]
-    solar_used = 0
-    battery_used = 0
     if type == "lecture_hall":
-        battery_used = demand
-    elif solar >= load["load"]:
-        solar_used = demand
+        battery_used = min(battery, demand)
+        solar_used = min(solar, demand - battery_used)
     else:
-        solar_used = solar
-        battery_used = demand - solar
-        
+        solar_used = min(solar, demand)
+        battery_used = min(battery, demand - solar_used)
+
     return {"solar": solar_used, "battery": battery_used, "grid": 0}
 
 def checkBattery(solar, load):
-    grid = 0
-    if load["type"] == "lecture_hall":
-        grid += load["load"]
-    else:
-        if solar < load["load"]:
-            solar = 0
-            grid += load["load"] - solar
-        else:
-            solar -= load["load"]
+    demand = load["load"]
+    solar_used = 0
+    if load["type"] != "lecture_hall":
+        solar_used = min(solar, demand)
 
-    return {"solar": solar_used, "battery": 0, "grid": grid}
+    return {"solar": solar_used, "battery": 0, "grid": demand - solar_used}
